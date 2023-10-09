@@ -17,16 +17,16 @@ public class CustomerService {
     @Autowired
     private  RedissonClient redissonClient;
 
-        public Customer saveData(Customer data) {
-            // Store data in MySQL
-            Customer customer = customerRepository.save(data);
+    public Customer saveData(Customer data) {
+        // Store data in MySQL
+        Customer customer = customerRepository.save(data);
 
-            // Store data in Redis
-            RMap<Integer, Customer> redisMap = redissonClient.getMap("yourDataMap");
-            customer= redisMap.put(data.getId() , data);
+        // Store data in Redis
+        RMap<Integer, Customer> redisMap = redissonClient.getMap("yourDataMap");
+        customer= redisMap.put(data.getId() , data);
 
-            return customer;
-        }
+        return customer;
+    }
 
     public Customer getData(int id) {
         // Attempt to retrieve data from Redis
@@ -41,10 +41,12 @@ public class CustomerService {
             // Data not found in Redis, attempt to retrieve from MySQL
 
             logger.info("this data is coming from database");
-            return customerRepository.findById(id).orElse(null);
+            Customer customerHehe = customerRepository.findById(id).orElse(null);
+            redisMap.put(id,customerHehe);
+
+            return customerHehe;
         }
     }
 
-        // Other methods to access data from both MySQL and Redis
-    }
-
+    // Other methods to access data from both MySQL and Redis
+}
